@@ -1,3 +1,6 @@
+Here’s a complete index.html drop‑in.
+It keeps your existing data (one_goal, one_entries, one_vToday) and adds all the tweaks you asked for.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,25 +8,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>One Thing</title>
 <style>
-  :root { --bg:#fafafa; --card:#ffffff; --text:#111; --muted:#6b7280; --line:#eaeaea; --brand:#16a34a; --brandText:#fff; }
-  html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{max-width:760px;margin:0 auto;padding:20px}
-  header{padding:22px 20px;text-align:center;background:#0b57d0;color:#fff}
-  header h1{margin:0 0 6px 0;font-size:24px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 1px 0 rgba(0,0,0,.02)}
-  .row{display:flex;gap:8px;align-items:center}
-  input[type=text]{flex:1;padding:12px 12px;border:1px solid var(--line);border-radius:10px;font-size:16px;outline:none}
-  button{border:0;border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer}
-  .primary{background:var(--brand);color:var(--brandText)}
-  .ghost{background:#f3f4f6}
+  /* Minimal, calm, serif (like your assistant manual), generous space */
+  :root{--bg:#f3f3f3;--card:#fff;--line:#e6e6e6;--text:#111;--muted:#666;--green:#16a34a;--blue:#0b57d0}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",Times,serif}
+  header{background:var(--blue);color:#fff;text-align:center;padding:22px 16px}
+  header h1{margin:0 0 6px 0;font-size:28px}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 1px 0 rgba(0,0,0,.03)}
   .muted{color:var(--muted)}
-  .streak{font-weight:600}
+  .row{display:flex;gap:10px;align-items:flex-start}
+  input[type=text]{flex:1;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;background:#fff;color:var(--text)}
+  input::placeholder{color:#999;opacity:1}
+  button{border:0;border-radius:10px;padding:12px 16px;font:inherit;cursor:pointer}
+  .primary{background:var(--green);color:#fff}
+  .ghost{background:#f6f6f6}
   .tick{display:inline-block;transition:transform .18s ease}
   .tick.pop{transform:scale(1.25)}
-  table{width:100%;border-collapse:collapse;font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:16px}
   th,td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}
-  th{color:var(--muted);font-weight:600}
-  .center{display:flex;gap:12px;justify-content:center;align-items:center}
+  th{color:var(--muted)}
+  #statusCard{display:none}
+  #dailyCard,#historyCard,#completeWrap,#goalCard{display:none}
+  @media (max-width:480px){ .row{flex-direction:column} button{width:100%} }
 </style>
 </head>
 <body>
@@ -33,185 +39,191 @@
 </header>
 
 <div class="wrap">
-
-  <!-- First-visit goal prompt -->
-  <div class="card" id="goalCard" style="display:none">
+  <!-- First visit -->
+  <div id="goalCard" class="card">
     <div class="muted" style="margin-bottom:8px">What’s your one goal?</div>
     <div class="row">
-      <input id="goalInput" type="text" placeholder="One line (e.g., Close £20k sale)" maxlength="80">
-      <button class="primary" id="saveGoal">Save</button>
+      <input id="goalInput" type="text" placeholder="One line (e.g., Close one £20k sale)" maxlength="80">
+      <button id="saveGoal" class="primary">Save</button>
     </div>
   </div>
 
-  <!-- Daily prompt + streak -->
-  <div class="card" id="dailyCard" style="display:none">
-    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div class="muted">Goal:</div>
-      <div id="goalLabel" style="font-weight:600"></div>
+  <!-- Daily question (hidden after logging today) -->
+  <div id="dailyCard" class="card">
+    <div class="muted" style="margin-bottom:8px">Goal:</div>
+    <div id="goalLabel" style="font-weight:700;margin-bottom:12px"></div>
+    <div class="row">
+      <input id="lineInput" type="text" maxlength="120"
+             placeholder="How did you move toward your goal today?"
+             aria-label="How did you move toward your goal today?">
+      <button id="logBtn" class="primary">Log today ✅</button>
     </div>
-    <div class="row" style="margin-bottom:8px">
-      <input id="lineInput" type="text" placeholder="How did you move toward your goal today?" maxlength="120">
-      <button class="primary" id="logBtn">Log today ✅</button>
-    </div>
-    <div class="muted">One line per day. No edits later.</div>
-    <div style="margin-top:12px">Streak: <span class="streak" id="streakNum">0</span> day<span id="plural">s</span> <span id="tick" class="tick">✅</span></div>
+    <div class="muted" style="margin-top:8px">One line per day. No edits later.</div>
   </div>
 
-  <!-- History (previous days only; shows after logging today) -->
-  <div class="card" id="historyCard" style="display:none">
+  <!-- After logging today -->
+  <div id="statusCard" class="card">
+    <div id="statusText">Logged for today <span class="tick">✅</span></div>
+    <div class="muted" id="streakLine" style="margin-top:6px"></div>
+  </div>
+
+  <!-- History -->
+  <div id="historyCard" class="card">
     <table>
-      <thead><tr><th style="width:120px">Date</th><th>One line</th></tr></thead>
+      <thead><tr><th style="width:260px">Date</th><th>One line</th></tr></thead>
       <tbody id="historyBody"></tbody>
     </table>
   </div>
 
-  <!-- Goal complete -->
-  <div class="center" id="completeWrap" style="display:none;margin:10px 0 26px">
-    <button class="primary" id="completeBtn">Goal complete ✅</button>
+  <!-- Goal complete below table -->
+  <div id="completeWrap" style="text-align:center;margin:10px 0 26px">
+    <button id="completeBtn" class="primary">Goal complete ✅</button>
   </div>
 </div>
 
 <script>
-  // ---------- helpers ----------
+  /* ---------- storage helpers ---------- */
   const LS = {
-    get: (k, f=null) => { try { return JSON.parse(localStorage.getItem(k)) ?? f } catch { return f } },
-    set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-    del: (k) => localStorage.removeItem(k)
-  };
-  const fmt = d => d.toISOString().slice(0,10); // yyyy-mm-dd
-  const addDays = (iso, n) => {
-    const d = new Date(iso); d.setDate(d.getDate()+n); return fmt(d);
+    get:(k,f=null)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
+    set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+    del:k=>localStorage.removeItem(k)
   };
 
-  // ---------- virtual day (advances 1 per refresh for testing) ----------
+  /* ---------- virtual day: +1 per refresh (testing) ---------- */
+  const iso = d=>d.toISOString().slice(0,10);
+  const addDays=(s,n)=>{const d=new Date(s);d.setDate(d.getDate()+n);return iso(d)};
   let vToday = LS.get('one_vToday');
-  if (!vToday) {
-    vToday = fmt(new Date()); // start at real today on first load
-  } else {
-    // advance by 1 day each refresh to simulate new days
-    vToday = addDays(vToday, 1);
-  }
+  if(!vToday){ vToday = iso(new Date()); } else { vToday = addDays(vToday,1); }
   LS.set('one_vToday', vToday);
 
-  // ---------- state ----------
-  let goal = LS.get('one_goal','');
-  let entries = LS.get('one_entries', []); // [{date:'yyyy-mm-dd', line:'text'}]
+  /* ---------- pretty date: Monday 15th August 2025 ---------- */
+  const ord = n => {
+    const s=["th","st","nd","rd"], v=n%100; return s[(v-20)%10]||s[v]||s[0];
+  };
+  function pretty(isoStr){
+    const d=new Date(isoStr);
+    const weekday=d.toLocaleString('en-GB',{weekday:'long'});
+    const day=d.getDate();
+    const month=d.toLocaleString('en-GB',{month:'long'});
+    const year=d.getFullYear();
+    return `${weekday} ${day}${ord(day)} ${month} ${year}`;
+  }
 
-  // ---------- elements ----------
-  const goalCard = document.getElementById('goalCard');
-  const goalInput = document.getElementById('goalInput');
-  const saveGoal = document.getElementById('saveGoal');
+  /* ---------- state ---------- */
+  let goal    = LS.get('one_goal','');
+  let entries = LS.get('one_entries',[]); // [{date,line}]
+  const hasEntry = s => entries.some(e=>e.date===s);
 
-  const dailyCard = document.getElementById('dailyCard');
-  const goalLabel = document.getElementById('goalLabel');
-  const lineInput = document.getElementById('lineInput');
-  const logBtn = document.getElementById('logBtn');
+  /* ---------- els ---------- */
+  const goalCard   = document.getElementById('goalCard');
+  const goalInput  = document.getElementById('goalInput');
+  const saveGoal   = document.getElementById('saveGoal');
 
-  const historyCard = document.getElementById('historyCard');
-  const historyBody = document.getElementById('historyBody');
+  const dailyCard  = document.getElementById('dailyCard');
+  const goalLabel  = document.getElementById('goalLabel');
+  const lineInput  = document.getElementById('lineInput');
+  const logBtn     = document.getElementById('logBtn');
 
-  const streakNum = document.getElementById('streakNum');
-  const plural = document.getElementById('plural');
-  const tick = document.getElementById('tick');
+  const statusCard = document.getElementById('statusCard');
+  const statusText = document.getElementById('statusText');
+  const streakLine = document.getElementById('streakLine');
 
-  const completeWrap = document.getElementById('completeWrap');
+  const historyCard= document.getElementById('historyCard');
+  const historyBody= document.getElementById('historyBody');
+
+  const completeWrap=document.getElementById('completeWrap');
   const completeBtn = document.getElementById('completeBtn');
 
-  // ---------- UI control ----------
-  function hasEntry(iso){ return entries.some(e => e.date === iso); }
-
-  function streakCount() {
-    let s = 0;
-    let d = vToday;
-    // count backwards while entries exist
-    while (hasEntry(d)) { s++; d = addDays(d, -1); }
+  /* ---------- UI ---------- */
+  function streak(){
+    let s=0, d=vToday;
+    while(hasEntry(d)){ s++; d=addDays(d,-1); }
     return s;
   }
 
-  function renderStreak(pop=false){
-    const s = streakCount();
-    streakNum.textContent = s;
-    plural.textContent = (s === 1) ? '' : 's';
-    if (pop) { tick.classList.add('pop'); setTimeout(()=>tick.classList.remove('pop'), 180); }
-  }
-
-  function renderHistory() {
-    // only show previous days up to yesterday (including gaps)
-    if (entries.length === 0) { historyCard.style.display = 'none'; return; }
-
-    const datesWithLines = new Map(entries.map(e => [e.date, e.line]));
+  function renderHistory(){
+    if(entries.length===0){ historyBody.innerHTML=''; return; }
     const first = entries.map(e=>e.date).sort()[0];
-    const last = addDays(vToday, -1); // up to yesterday
-
-    if (!first || first > last) { historyCard.style.display='none'; return; }
-
-    historyBody.innerHTML = '';
-    // iterate from last down to first so newest previous is on top
-    let cur = last;
-    while (cur >= first) {
-      const tr = document.createElement('tr');
-      const tdDate = document.createElement('td');
-      tdDate.textContent = cur;
-      const tdLine = document.createElement('td');
-      tdLine.textContent = datesWithLines.get(cur) ?? '';
-      tr.appendChild(tdDate); tr.appendChild(tdLine);
+    historyBody.innerHTML='';
+    // include TODAY at top, include gaps
+    let cur=vToday;
+    while(cur>=first){
+      const line = (entries.find(e=>e.date===cur)||{}).line || '';
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td>${pretty(cur)}</td><td>${line}</td>`;
       historyBody.appendChild(tr);
-      cur = addDays(cur, -1);
+      cur=addDays(cur,-1);
     }
-    historyCard.style.display = 'block';
   }
 
-  function showShell() {
-    if (!goal) {
-      goalCard.style.display = 'block';
-      dailyCard.style.display = 'none';
-      completeWrap.style.display = 'none';
+  function showState(){
+    if(!goal){
+      goalCard.style.display='block';
+      dailyCard.style.display='none';
+      statusCard.style.display='none';
+      historyCard.style.display='none';
+      completeWrap.style.display='none';
       return;
     }
-    goalLabel.textContent = goal;
-    goalCard.style.display = 'none';
-    dailyCard.style.display = 'block';
-    completeWrap.style.display = 'flex';
-    renderStreak(false);
+    goalCard.style.display='none';
+    goalLabel.textContent=goal;
 
-    // reveal previous days only if today's entry exists
-    if (hasEntry(vToday)) renderHistory();
-    else historyCard.style.display = 'none';
+    if(!hasEntry(vToday)){
+      // show daily input; hide status/streak/table until after logging
+      dailyCard.style.display='block';
+      statusCard.style.display='none';
+      historyCard.style.display='none';
+      completeWrap.style.display='none';
+    }else{
+      dailyCard.style.display='none';
+      statusCard.style.display='block';
+      const s=streak();
+      statusText.innerHTML=`Logged for today <span class="tick">✅</span>`;
+      streakLine.textContent = `Streak: ${s} day${s===1?'':'s'} ✅`;
+      renderHistory();
+      historyCard.style.display='block';
+      completeWrap.style.display='block';
+    }
   }
 
-  // ---------- events ----------
-  saveGoal.onclick = () => {
-    const text = (goalInput.value || '').trim();
-    if (!text) { goalInput.focus(); return; }
-    goal = text;
-    LS.set('one_goal', goal);
-    goalInput.value = '';
-    showShell();
+  /* ---------- actions ---------- */
+  saveGoal.onclick=()=>{
+    const t=(goalInput.value||'').trim();
+    if(!t){goalInput.focus();return;}
+    goal=t; LS.set('one_goal',goal);
+    showState();
   };
 
-  logBtn.onclick = () => {
-    const line = (lineInput.value || '').trim();
-    if (!line) { lineInput.focus(); return; }
-    if (hasEntry(vToday)) { lineInput.value = ''; return; } // immutable
-    entries.push({date: vToday, line});
-    LS.set('one_entries', entries);
-    lineInput.value = '';
-    renderStreak(true);
-    renderHistory();                // now reveal previous days
+  logBtn.onclick=()=>{
+    const line=(lineInput.value||'').trim();
+    if(!line){lineInput.focus();return;}
+    if(hasEntry(vToday)) return; // one attempt per day
+    entries.push({date:vToday,line});
+    LS.set('one_entries',entries);
+    lineInput.value='';
+    // show confirmation + streak + table (includes today)
+    dailyCard.style.display='none';
+    statusCard.style.display='block';
+    document.querySelector('.tick').classList.add('pop');
+    setTimeout(()=>document.querySelector('.tick').classList.remove('pop'),180);
+    const s=streak();
+    streakLine.textContent=`Streak: ${s} day${s===1?'':'s'} ✅`;
+    renderHistory();
+    historyCard.style.display='block';
+    completeWrap.style.display='block';
   };
 
-  completeBtn.onclick = () => {
-    if (!confirm('Mark goal complete and reset?')) return;
-    LS.del('one_goal');
-    LS.del('one_entries');
-    goal = '';
-    entries = [];
-    showShell();
-    historyCard.style.display='none';
+  completeBtn.onclick=()=>{
+    if(!confirm('Mark goal complete and reset?')) return;
+    LS.del('one_goal'); LS.del('one_entries');
+    goal=''; entries=[];
+    showState();
   };
 
-  // ---------- boot ----------
-  showShell();
+  /* ---------- boot ---------- */
+  showState();
 </script>
 </body>
 </html>
+
+Drop this in, commit, refresh your site — your existing entries should remain.
