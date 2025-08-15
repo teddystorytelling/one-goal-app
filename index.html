@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Goal Tracker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        main {
+            flex: 1;
+            padding: 1rem;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .goal-input {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: white;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>One Goal Tracker</h1>
+        <p>It doesn’t tell you what to do, it asks what you’ve done. 💙</p>
+    </header>
+    <main>
+        <div class="goal-input">
+            <input type="text" id="goal" placeholder="What did you do today?">
+            <button onclick="addGoal()">Add</button>
+        </div>
+        <ul id="goalList"></ul>
+    </main>
+
+    <script>
+        function addGoal() {
+            const goalInput = document.getElementById('goal');
+            const goalText = goalInput.value.trim();
+            if (goalText === '') return;
+            
+            const li = document.createElement('li');
+            li.textContent = goalText;
+            document.getElementById('goalList').appendChild(li);
+            
+            goalInput.value = '';
+        }
+    </script>
+</body>
+</html>
