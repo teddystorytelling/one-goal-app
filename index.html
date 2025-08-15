@@ -28,21 +28,29 @@
   }
 
   .wrap{max-width:880px;margin:46px auto 96px;padding:0 20px}
-  .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+
+  /* Title */
+  .hero{display:flex; align-items:center; gap:14px; margin-bottom:18px;}
   .dot{
-    width:12px;height:12px;border-radius:50%;
+    width:14px;height:14px;border-radius:50%;
     background:linear-gradient(180deg,#9ef2c2 0%, #2ad66c 100%);
-    box-shadow:0 0 0 6px rgba(42,214,108,.12),0 6px 20px rgba(42,214,108,.35);
+    box-shadow:0 0 0 7px rgba(42,214,108,.12),0 8px 22px rgba(42,214,108,.35);
   }
-  h1{margin:0;font-size:clamp(22px,4vw,28px);font-weight:800;letter-spacing:-.01em}
-  .subtitle{margin:4px 0 22px;color:var(--muted);font-size:14px}
+  h1{
+    margin:0;
+    font-size: clamp(24px, 6vw, 38px);
+    font-weight:800; letter-spacing:-.01em;
+  }
 
   /* Cards */
   .card{
     background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0)), var(--card);
     border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:clip;
   }
-  .stack{padding:18px;display:grid;gap:14px}
+  .stack{padding:20px;display:grid;gap:14px}
+
+  /* Section header */
+  .section-head{display:flex; align-items:center; justify-content:space-between; padding: 2px 2px 8px; font-weight:700;}
 
   /* Input + Neon button */
   .row{display:grid;grid-template-columns:1fr auto;gap:12px}
@@ -57,19 +65,14 @@
   }
   .onething:focus{border-color:#2ad66c80; box-shadow:0 0 0 6px rgba(42,214,108,.1)}
 
-  /* Karaoke placeholder overlay */
+  /* Karaoke placeholder overlay (slower) */
   .karaoke{
     position:absolute; inset:0; display:flex; align-items:center; overflow:hidden;
     pointer-events:none; padding:0 16px; color:#8bb39e;
     opacity:.9; white-space:nowrap; mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
   }
-  .karaoke span{
-    display:inline-block; animation: marquee 8s linear infinite;
-  }
-  @keyframes marquee{
-    0%{ transform: translateX(0%) }
-    100%{ transform: translateX(-100%) }
-  }
+  .karaoke span{ display:inline-block; animation: marquee 18s linear infinite; }
+  @keyframes marquee{ 0%{ transform: translateX(0%) } 100%{ transform: translateX(-100%) } }
   .hidden{display:none !important}
 
   .btn{
@@ -84,13 +87,14 @@
     transition: transform .06s, filter .2s, box-shadow .2s;
   }
   .btn:active{ transform: translateY(1px); filter: brightness(.96) }
+  .btn[disabled]{opacity:.55; cursor:default}
 
   /* Views with iPad-like slide/fade */
   .view{display:none; opacity:0; transform:translateX(14px); transition: opacity var(--t), transform var(--t)}
   .view.active{display:block; opacity:1; transform:translateX(0)}
   .view.exiting{opacity:0; transform:translateX(-12px)}
 
-  /* Today-only action table (luster) */
+  /* Table (revealed only after today’s log) */
   .table{
     width:100%; border-collapse:separate; border-spacing:0; margin-top:8px;
   }
@@ -104,6 +108,7 @@
   .td-date{ width:160px; color:var(--muted); white-space:nowrap }
   .td-text{ width:auto }
   .empty{ padding:24px 18px; color:var(--muted); border-top:1px solid var(--border) }
+  .hidden-block{ display:none }
 
   .goal-complete-wrap{ padding: 14px 18px 18px; display:flex; justify-content:flex-end }
   .btn-ghost{
@@ -112,15 +117,16 @@
   }
   .btn-ghost:active{ filter:brightness(.92) }
 
-  /* Footer */
+  /* Footer (Apple-luxury glass; hidden on first page) */
   footer{
-    display:none; position:fixed; left:0; right:0; bottom:0; padding:14px 16px;
-    background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.45));
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-top:1px solid var(--border);
+    display:none; position:fixed; left:0; right:0; bottom:0; padding:12px 14px;
+    background:rgba(8,12,18,.55);
+    backdrop-filter: blur(18px) saturate(120%); -webkit-backdrop-filter: blur(18px) saturate(120%);
+    border-top:1px solid rgba(255,255,255,.12);
+    box-shadow: 0 -2px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .footer-inner{max-width:880px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}
-  .settings-link{ padding:6px 10px; border:1px solid var(--glass-border); border-radius:8px; background:var(--glass) }
+  .footer-inner{max-width:880px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;color:#cfd6e3;font-size:13px;letter-spacing:.01em}
+  .settings-link{ padding:7px 12px; border:1px solid var(--glass-border); border-radius:10px; background:var(--glass) }
 
   /* Celebration overlay (Goal Complete) */
   .overlay{
@@ -157,7 +163,7 @@
   .cele-archive thead th{ position:sticky; top:0; background:#0f1116d9; backdrop-filter:blur(6px); color:var(--muted); font-size:12px }
   .cele-archive tbody tr{ border-top:1px solid var(--border) }
 
-  /* Streak overlay (gated) */
+  /* Streak overlay (gated, after logging action if streak ≥ 2) */
   .streak-pills{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:720px; margin: 10px auto 0 }
   .pill{
     padding:10px 14px; border-radius:999px;
@@ -174,11 +180,7 @@
   .danger{ background:linear-gradient(180deg,#ff7b7b,#ff5252); border-color:#ff6b6b; color:#1b0b0b; box-shadow:0 6px 18px rgba(255,105,105,.35) }
 
   /* Sign-up collapsible */
-  .collapse{
-    border:1px solid var(--border);
-    border-radius: var(--radius);
-    overflow:hidden;
-  }
+  .collapse{ border:1px solid var(--border); border-radius: var(--radius); overflow:hidden; }
   .collapse-head{
     display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0));
@@ -188,7 +190,7 @@
     max-height:0; overflow:hidden; transition:max-height 340ms var(--ease);
     background: var(--panel); border-top:1px solid var(--border);
   }
-  .collapse.open .collapse-body{ max-height:560px } /* enough to reveal the form */
+  .collapse.open .collapse-body{ max-height:560px }
 
   .field{display:flex;flex-direction:column;gap:8px;margin:12px 16px}
   .input{width:100%;padding:14px;background:#0c0e12;border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text)}
@@ -204,15 +206,16 @@
 <body>
 
 <div class="wrap">
-  <div class="brand">
-    <div class="dot"></div><h1>One Thing</h1>
+  <div class="hero">
+    <div class="dot"></div>
+    <h1>There’s only one thing you have to do…</h1>
   </div>
-  <div class="subtitle">Calm, clear, long‑term. Log one meaningful action a day.</div>
 
   <!-- GOAL SETUP (first-time) -->
   <div id="view-goal" class="view active">
     <div class="card">
       <div class="stack">
+        <div class="section-head">What’s your one goal?</div>
         <div class="row">
           <div class="input-wrap">
             <input id="goalInput" class="onething" type="text" autocomplete="off">
@@ -220,7 +223,6 @@
           </div>
           <button id="saveGoalBtn" class="btn">Save</button>
         </div>
-        <div class="subtitle" style="margin-top:-4px;">What’s your one goal?</div>
       </div>
     </div>
   </div>
@@ -229,29 +231,28 @@
   <div id="view-actions" class="view">
     <div class="card">
       <div class="stack">
-        <div class="row">
+        <div class="section-head" id="goalLabel"></div>
+        <div id="actionInputRow" class="row">
           <div class="input-wrap">
             <input id="actionInput" class="onething" type="text" autocomplete="off" placeholder="What’s the one thing you did toward your goal?">
           </div>
           <button id="logActionBtn" class="btn">Log Action</button>
         </div>
-        <div id="goalLabel" class="subtitle" style="margin-top:-4px;"></div>
       </div>
 
-      <table class="table" id="logTable">
-        <thead>
-          <tr>
-            <th class="td-date">Date</th>
-            <th class="td-text">Actions toward this goal</th>
-          </tr>
-        </thead>
-        <tbody id="logBody">
-          <tr id="emptyRow"><td colspan="2" class="empty">No actions yet. Log your first one above.</td></tr>
-        </tbody>
-      </table>
+      <div id="tableBlock" class="hidden-block">
+        <table class="table" id="logTable">
+          <thead>
+            <tr><th class="td-date">Date</th><th class="td-text">Actions toward this goal</th></tr>
+          </thead>
+          <tbody id="logBody">
+            <tr id="emptyRow"><td colspan="2" class="empty">No actions yet. Log your first one above.</td></tr>
+          </tbody>
+        </table>
 
-      <div class="goal-complete-wrap">
-        <button id="completeGoalBtn" class="btn-ghost">Goal complete</button>
+        <div class="goal-complete-wrap">
+          <button id="completeGoalBtn" class="btn-ghost">Goal complete</button>
+        </div>
       </div>
     </div>
   </div>
@@ -261,9 +262,7 @@
     <div class="card" style="padding:18px;">
       <h3 class="section-title">Achievements</h3>
       <div id="achievementsList" class="subtitle">No completed goals yet.</div>
-      <div style="margin-top:10px;">
-        <button id="achBackBtn" class="btn-ghost">Back</button>
-      </div>
+      <div style="margin-top:10px;"><button id="achBackBtn" class="btn-ghost">Back</button></div>
     </div>
   </div>
 
@@ -280,29 +279,12 @@
           <span id="signupChevron">▸</span>
         </div>
         <div class="collapse-body" id="signupBody">
-          <div class="field">
-            <label>Name</label>
-            <input id="name" class="input" type="text" placeholder="Your name">
-          </div>
-          <div class="field">
-            <label>Email</label>
-            <input id="email" class="input" type="email" placeholder="you@example.com">
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <input id="pass" class="input" type="password" placeholder="••••••••">
-          </div>
-          <div class="field">
-            <label>Confirm password</label>
-            <input id="confirm" class="input" type="password" placeholder="••••••••">
-          </div>
-          <label class="consent">
-            <input id="consent" type="checkbox">
-            <span>I agree to data protection & privacy terms.</span>
-          </label>
-          <div style="padding:0 16px 16px;">
-            <button id="signupBtn" class="btn" style="width:100%;">Create account</button>
-          </div>
+          <div class="field"><label>Name</label><input id="name" class="input" type="text" placeholder="Your name"></div>
+          <div class="field"><label>Email</label><input id="email" class="input" type="email" placeholder="you@example.com"></div>
+          <div class="field"><label>Password</label><input id="pass" class="input" type="password" placeholder="••••••••"></div>
+          <div class="field"><label>Confirm password</label><input id="confirm" class="input" type="password" placeholder="••••••••"></div>
+          <label class="consent"><input id="consent" type="checkbox"><span>I agree to data protection & privacy terms.</span></label>
+          <div style="padding:0 16px 16px;"><button id="signupBtn" class="btn" style="width:100%;">Create account</button></div>
           <div id="pretendBlock" class="pretend">✅ Pretend: a magic link was just “sent”. We’re not sending emails in this prototype.</div>
         </div>
       </div>
@@ -310,10 +292,10 @@
   </div>
 </div>
 
-<!-- FOOTER -->
+<!-- FOOTER (hidden on goal view) -->
 <footer id="footer">
   <div class="footer-inner">
-    <span>© Teddy’s Storytelling</span>
+    <span>Teddy Storytelling</span>
     <a id="openSettings" class="settings-link" href="javascript:void(0)">Settings</a>
   </div>
 </footer>
@@ -340,7 +322,7 @@
   </div>
 </div>
 
-<!-- STREAK OVERLAY (gated, after logging action if streak ≥ 2) -->
+<!-- STREAK OVERLAY (gated after logging action if streak ≥ 2) -->
 <div id="streakGate" class="overlay" aria-modal="true" role="dialog">
   <div class="cele-card">
     <div class="cele-hero">
@@ -350,26 +332,43 @@
       <div id="streakLabel" class="cele-sub"></div>
       <div class="streak-pills" id="streakPills"></div>
     </div>
-    <div class="cele-actions">
-      <button id="closeStreakBtn" class="btn-ghost">Close</button>
-    </div>
+    <div class="cele-actions"><button id="closeStreakBtn" class="btn-ghost">Close</button></div>
   </div>
 </div>
 
 <script>
 /* ================= Storage Keys ================= */
 const K = {
-  GOAL: 'ot.goal',              // { text, createdAt, completedAt? }
-  ACTIONS: 'ot.actions',        // [ {date, text, time} ] for current goal
-  STREAK: 'ot.streak',          // number
-  LAST_ACTION: 'ot.lastAction', // ISO date string
-  ACH: 'ot.achievements',       // [ { goal:{text,createdAt,completedAt}, actions:[...] } ]
-  FOOTER: 'ot.footer'           // '1' after first action
+  GOAL: 'ot.goal',
+  ACTIONS: 'ot.actions',
+  STREAK: 'ot.streak',
+  LAST_ACTION: 'ot.lastAction',
+  ACH: 'ot.achievements',
+  FOOTER: 'ot.footer',
+  SIM_DAY: 'ot.simDay' // simulated "today" (ISO) for test-as-new-day
 };
 
+/* ================= Simulated day (each refresh = +1 day) ================= */
+function realTodayISO(){ return new Date().toISOString().slice(0,10); }
+function isoPlusDays(iso, days){
+  const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
+function initSimDay(){
+  let sim = localStorage.getItem(K.SIM_DAY);
+  if(!sim){ sim = realTodayISO(); }
+  else{ sim = isoPlusDays(sim, 1); } // advance 1 day on each load
+  localStorage.setItem(K.SIM_DAY, sim);
+  return sim;
+}
+let SIM_TODAY = initSimDay();
+function todayISO(){ return SIM_TODAY; }
+function yISO(){
+  const d = new Date(SIM_TODAY+'T00:00:00'); d.setDate(d.getDate()-1);
+  return d.toISOString().slice(0,10);
+}
+
 /* ================= Utilities ================= */
-const todayISO = ()=> new Date().toISOString().slice(0,10);
-const yISO = ()=> { const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
 const fmt = iso => new Date(iso+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 const load = (k,def)=> { try{ const v=JSON.parse(localStorage.getItem(k)); return v??def; }catch{ return def; } };
 const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
@@ -388,6 +387,8 @@ function switchView(to){
   if(cur){ cur.classList.add('exiting'); setTimeout(()=>{ cur.classList.remove('active','exiting'); }, 150); }
   nxt.classList.add('active');
   currentView = to;
+  // footer: hidden on goal view, visible elsewhere if enabled
+  showFooterIfNeeded();
 }
 
 /* Goal setup */
@@ -397,12 +398,12 @@ const goalKaraoke = document.getElementById('goalKaraoke');
 const karaokeSpan = goalKaraoke.querySelector('span');
 
 /* Actions view */
+const actionInputRow = document.getElementById('actionInputRow');
 const actionInput = document.getElementById('actionInput');
 const logActionBtn = document.getElementById('logActionBtn');
 const goalLabel = document.getElementById('goalLabel');
+const tableBlock = document.getElementById('tableBlock');
 const logBody = document.getElementById('logBody');
-const emptyRow = document.getElementById('emptyRow');
-const completeGoalBtn = document.getElementById('completeGoalBtn');
 
 /* Footer / Settings */
 const footer = document.getElementById('footer');
@@ -413,7 +414,6 @@ const deactivateBtn = document.getElementById('deactivateBtn');
 const signupCollapse = document.getElementById('signupCollapse');
 const signupHead = document.getElementById('signupHead');
 const signupChevron = document.getElementById('signupChevron');
-const signupBody = document.getElementById('signupBody');
 const signupBtn = document.getElementById('signupBtn');
 const pretendBlock = document.getElementById('pretendBlock');
 
@@ -425,7 +425,7 @@ const confetti1 = document.getElementById('confetti1');
 const closeCeleBtn = document.getElementById('closeCeleBtn');
 const viewAchievementsBtn = document.getElementById('viewAchievementsBtn');
 
-/* Streak overlay (gated) */
+/* Streak overlay */
 const streakGate = document.getElementById('streakGate');
 const confetti2 = document.getElementById('confetti2');
 const streakLabel = document.getElementById('streakLabel');
@@ -452,6 +452,9 @@ function renderGoalLabel(){
   const g = load(K.GOAL, null);
   goalLabel.textContent = g ? `Goal: ${g.text}` : '';
 }
+function hasLoggedToday(actions){
+  return actions.some(a=> a.date === todayISO());
+}
 function renderActionsTable(){
   const actions = load(K.ACTIONS, []);
   logBody.innerHTML = '';
@@ -468,9 +471,18 @@ function renderActionsTable(){
     tr.appendChild(td1); tr.appendChild(td2); logBody.appendChild(tr);
   });
 }
-function showFooterIfNeeded(){
-  const has = localStorage.getItem(K.FOOTER)==='1';
-  footer.style.display = has ? 'block' : 'none';
+function refreshActionsViewReveal(){
+  const actions = load(K.ACTIONS, []);
+  const todayDone = hasLoggedToday(actions);
+  if(todayDone){
+    // hide input row, reveal table
+    actionInputRow.style.display = 'none';
+    tableBlock.classList.remove('hidden-block');
+  }else{
+    // show input row, keep table hidden (even if past exists)
+    actionInputRow.style.display = '';
+    tableBlock.classList.add('hidden-block');
+  }
 }
 
 /* ================= Confetti ================= */
@@ -539,69 +551,64 @@ function closeStreakGate(){
 }
 
 /* ================= Actions ================= */
-saveGoalBtn.addEventListener('click', ()=>{
+document.getElementById('saveGoalBtn').addEventListener('click', ()=>{
   const text = goalInput.value.trim();
   if(!text){ alert('Please enter your one goal.'); return; }
   const goal = { text, createdAt: new Date().toISOString() };
   save(K.GOAL, goal);
   save(K.ACTIONS, []); // fresh action list for this goal
-  // move to actions view
   renderGoalLabel(); renderActionsTable();
   switchView('act');
+  refreshActionsViewReveal();
 });
 
-logActionBtn.addEventListener('click', ()=>{
+document.getElementById('logActionBtn').addEventListener('click', ()=>{
   const text = actionInput.value.trim();
-  if(!text){ alert('Enter the one action you did toward your goal.'); return; }
+  if(!text){ return; }
   const actions = load(K.ACTIONS, []);
-  // one action per day rule
-  const hasToday = actions.some(a=> a.date === todayISO());
-  if(hasToday){ alert('Only one action per day. Come back tomorrow.'); return; }
+  // enforce one per day silently by revealing table & hiding input (no popup)
+  if(actions.some(a=> a.date === todayISO())){
+    refreshActionsViewReveal(); return;
+  }
 
   const entry = { date: todayISO(), text, time: new Date().toISOString() };
   actions.push(entry); save(K.ACTIONS, actions);
-  actionInput.value=''; renderActionsTable();
+  actionInput.value='';
+  renderActionsTable();
+  refreshActionsViewReveal();
 
-  // first time -> reveal footer
-  localStorage.setItem(K.FOOTER,'1'); showFooterIfNeeded();
+  // first time -> reveal footer on non-goal views
+  localStorage.setItem(K.FOOTER,'1');
+  showFooterIfNeeded();
 
   // streak update and gated overlay (show only when streak >= 2)
   const streak = updateStreakOnAction();
   if(streak >= 2){ openStreakGate(streak); }
 });
 
-completeGoalBtn.addEventListener('click', ()=>{
+document.getElementById('completeGoalBtn').addEventListener('click', ()=>{
   const goal = load(K.GOAL, null);
   if(!goal){ alert('No active goal to complete.'); return; }
   const actions = load(K.ACTIONS, []);
-  if(!actions.length && !confirm('Complete goal with no actions?')) return;
-
   goal.completedAt = new Date().toISOString();
   const ach = load(K.ACH, []);
   ach.push({ goal, actions });
   save(K.ACH, ach);
 
-  // open celebration overlay (shows this goal + its actions)
   openCelebration(goal, actions);
-
-  // reset current goal state AFTER the celebration (so we can still show its data)
-  // We'll reset when closing the celebration, to avoid losing the display.
+  // reset after closing celebration
 });
 
 /* celebration buttons */
-closeCeleBtn.addEventListener('click', ()=>{
-  // Reset current goal after celebration close
+document.getElementById('closeCeleBtn').addEventListener('click', ()=>{
   save(K.GOAL, null); save(K.ACTIONS, []);
   closeCelebration();
-  // Back to goal setup for next cycle
   switchView('goal');
   setKaraokeText(); toggleKaraoke();
 });
-viewAchievementsBtn.addEventListener('click', ()=>{
-  // commit reset before navigating
+document.getElementById('viewAchievementsBtn').addEventListener('click', ()=>{
   save(K.GOAL, null); save(K.ACTIONS, []);
   closeCelebration();
-  // render achievements then show
   const ach = load(K.ACH, []);
   const box = document.getElementById('achievementsList');
   if(!ach.length){ box.textContent = 'No completed goals yet.'; }
@@ -622,22 +629,18 @@ viewAchievementsBtn.addEventListener('click', ()=>{
   }
   switchView('ach');
 });
-document.getElementById('achBackBtn').addEventListener('click', ()=>{
-  switchView('goal');
-  setKaraokeText(); toggleKaraoke();
-});
 
 /* settings */
-openSettings.addEventListener('click', ()=> switchView('set'));
+document.getElementById('openSettings').addEventListener('click', ()=> switchView('set'));
 deactivateBtn.addEventListener('click', ()=>{
   if(confirm('Deactivate account and clear all data?')){
     Object.values(K).forEach(k=> localStorage.removeItem(k));
-    // Reset UI
+    SIM_TODAY = initSimDay(); // reset sim day to restart flow nicely
     switchView('goal');
-    showFooterIfNeeded();
     goalInput.value=''; actionInput.value='';
     renderActionsTable(); renderGoalLabel();
     setKaraokeText(); toggleKaraoke();
+    footer.style.display='none';
     alert('All cleared. Fresh start.');
   }
 });
@@ -650,19 +653,15 @@ function toggleSignup(){
   signupChevron.textContent = collapseOpen ? '▾' : '▸';
 }
 signupHead.addEventListener('click', toggleSignup);
-
 signupBtn.addEventListener('click', ()=>{
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
   const pass = document.getElementById('pass').value;
   const confirm = document.getElementById('confirm').value;
   const consent = document.getElementById('consent').checked;
-
   if(!name || !email || !pass || !confirm){ alert('Please complete all fields.'); return; }
   if(pass !== confirm){ alert('Passwords do not match.'); return; }
   if(!consent){ alert('Please tick the data protection consent.'); return; }
-
-  // Simulated sign-up (pretend magic link)
   localStorage.setItem('ot.user', JSON.stringify({name,email}));
   pretendBlock.style.display='block';
 });
@@ -675,15 +674,30 @@ goalInput.addEventListener('focus', toggleKaraoke);
 goalInput.addEventListener('blur', toggleKaraoke);
 goalInput.addEventListener('input', toggleKaraoke);
 
+/* ================= Footer display logic ================= */
+function showFooterIfNeeded(){
+  // Footer never shows on goal view; shows on others if flag set
+  if(currentView === 'goal'){ footer.style.display = 'none'; return; }
+  const has = localStorage.getItem(K.FOOTER)==='1';
+  footer.style.display = has ? 'block' : 'none';
+}
+
 /* ================= Init ================= */
 (function init(){
-  // If a goal exists already, jump straight to actions; else show goal setup
+  // If a goal exists, go to actions; else show goal setup
   const g = load(K.GOAL, null);
-  if(g){ renderGoalLabel(); renderActionsTable(); switchView('act'); }
-  showFooterIfNeeded();
+  if(g){
+    renderGoalLabel(); renderActionsTable(); switchView('act');
+    refreshActionsViewReveal();
+  }else{
+    views.goal.classList.add('active'); currentView='goal';
+  }
 
-  // initial karaoke text
+  // karaoke
   setKaraokeText(); toggleKaraoke();
+
+  // footer visibility on first load
+  showFooterIfNeeded();
 })();
 </script>
 </body>
