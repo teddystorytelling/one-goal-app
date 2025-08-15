@@ -5,277 +5,276 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>One Thing</title>
 <style>
-  /* Palette */
   :root{
-    --bg:#f4f5f7;
+    --bg:#f5f6f8;
     --panel:#ffffff;
-    --ink:#0e1116;
+    --ink:#131313;
     --muted:#6b7280;
-    --line:#e5e7eb;
+    --line:#e7e7ea;
     --blue:#0b57d0;
-    --blue-soft:#0b57d0;
-    --green:#16a34a;
-    --shadow: 0 20px 40px rgba(20,22,25,.06), 0 2px 8px rgba(20,22,25,.04);
-    --radius:20px;
+    --green:#17a34a;
+    --shadow:0 8px 28px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.05);
+    --radius:18px;
   }
 
-  /* Global */
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);}
-  /* Elevated, calm serif for luxury feel */
-  body{font-family: "Georgia","Times New Roman",Times,serif; -webkit-font-smoothing:antialiased; line-height:1.45;}
+  /* Type: serif for headings (assistant-manual vibe), clean sans for body */
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  h1,h2,th{font-family:Georgia,"Times New Roman",Times,serif;letter-spacing:.2px}
 
   /* Hero */
   .hero{
-    background:linear-gradient(180deg, var(--blue-soft) 0%, #1a66e8 100%);
-    color:#fff; text-align:center;
-    padding:56px 18px 50px;
+    background:linear-gradient(180deg, rgba(11,87,208,.96) 0%, rgba(11,87,208,.88) 100%);
+    color:#fff; text-align:center; padding:54px 18px 42px;
   }
-  .title{
-    font-size:42px; letter-spacing:.2px; margin:0 0 10px 0;
-  }
-  .subtitle{
-    margin:0 auto; max-width:760px; opacity:.95; font-size:18px;
-  }
+  .hero h1{margin:0 0 10px;font-size:42px;line-height:1.12}
+  .hero p{margin:0 auto;max-width:680px;opacity:.95;font-size:18px}
 
-  /* Frame */
-  .wrap{max-width:880px;margin:-36px auto 60px;padding:0 16px;}
-  .panel{
+  /* Layout */
+  .wrap{max-width:860px;margin:-34px auto 64px;padding:0 18px}
+  .card{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-    box-shadow:var(--shadow); padding:28px; margin-bottom:18px;
+    box-shadow:var(--shadow); padding:22px 22px; margin:18px 0;
   }
 
-  /* Goal + Daily boxes (typeform feel) */
-  .block{
-    display:flex; flex-direction:column; gap:14px; align-items:stretch;
+  /* Goal / daily input */
+  .label{color:var(--muted); font-weight:600; margin-bottom:8px}
+  .goal-title{font-family:Georgia,"Times New Roman",Times,serif;font-weight:700;font-size:26px;margin:0 0 10px}
+  .stack{display:flex; flex-direction:column; gap:12px; align-items:stretch}
+  .field{
+    width:100%; border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+    font:inherit; font-size:18px; background:#fff; color:var(--ink); box-sizing:border-box;
   }
-  .label{color:var(--muted); font-size:15px; letter-spacing:.2px;}
-  .goal-head{font-weight:700; font-size:22px; margin-top:-4px;}
-
-  .input, .btn{
-    font:inherit; border-radius:16px; padding:16px 18px; width:100%;
-    border:1px solid var(--line); background:#fff; color:var(--ink);
+  .field::placeholder{color:#9aa0a6;opacity:1}
+  .btn{
+    width:100%; border:0; border-radius:14px; padding:16px 18px; font:inherit; font-weight:600;
+    background:var(--green); color:#fff; cursor:pointer; transition:filter .15s ease, transform .02s ease;
   }
-  .input::placeholder{color:#9aa0a6;}
-  .btn{border:0; cursor:pointer; transition:transform .04s ease, box-shadow .14s ease;}
   .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--green); color:#fff;}
-  .btn-primary:focus{outline:3px solid rgba(22,163,74,.25)}
-  .btn-soft{background:#f8fafc; color:var(--ink);}
+  .hint{color:var(--muted); font-size:14px; margin-top:4px}
 
-  .note{color:var(--muted); font-size:14px}
-
-  /* Status + streak */
-  .status{display:flex; align-items:center; gap:10px; font-size:17px}
-  .streak{color:var(--muted); margin-top:6px}
-
-  .tick{display:inline-block; transition:transform .18s ease}
-  .tick.pop{transform:scale(1.18)}
-
-  /* Table (grid-based, real “table” feel) */
-  .table{border:1px solid var(--line); border-radius:16px; overflow:hidden;}
-  .thead, .row{
-    display:grid; grid-template-columns: 220px 1fr; align-items:center;
+  /* Status pill */
+  .status{
+    display:flex; flex-direction:column; gap:6px; font-size:18px;
   }
-  .thead{background:#f8fafc; color:#475569; font-weight:700}
-  .cell{padding:14px 16px; border-bottom:1px solid var(--line);}
-  .row:last-child .cell{border-bottom:0}
+  .tick{display:inline-block;transform:translateZ(0);transition:transform .18s ease}
+  .tick.pop{transform:scale(1.2)}
 
-  /* Layout visibility */
-  #goalCard, #dailyCard, #statusCard, #historyCard, #completeWrap{display:none}
-
-  @media (max-width:560px){
-    .title{font-size:34px}
-    .thead,.row{grid-template-columns:170px 1fr}
+  /* Table */
+  .table-card{padding:0}
+  .table-wrap{padding:10px 14px 14px}
+  table{width:100%; border-collapse:separate; border-spacing:0}
+  thead th{
+    text-align:left; color:#3b3b3b; font-weight:700; font-size:16px; padding:12px 10px 10px;
+    border-bottom:1px solid var(--line);
   }
+  tbody td{padding:14px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  .col-date{width:38%; max-width:340px; color:#374151; font-family:Georgia,"Times New Roman",Times,serif}
+  .col-line{width:62%; font-size:18px}
+  @media (min-width:540px){ .col-date{width:34%} .col-line{width:66%} }
+  @media (min-width:820px){ .col-date{width:32%} .col-line{width:68%} }
+
+  /* Complete */
+  .complete {
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:18px; text-align:center;
+  }
+
+  /* Accessibility focus */
+  .field:focus, .btn:focus{outline:3px solid rgba(11,87,208,.25); outline-offset:2px}
 </style>
 </head>
 <body>
-  <section class="hero">
-    <h1 class="title">One Thing</h1>
-    <p class="subtitle">It doesn’t tell you what to do — it asks what you’ve done. 💙</p>
-  </section>
+  <header class="hero">
+    <h1>One Thing</h1>
+    <p>It doesn’t tell you what to do — it asks what you’ve done. 💙</p>
+  </header>
 
   <main class="wrap">
-    <!-- First-time goal -->
-    <section id="goalCard" class="panel">
-      <div class="block">
-        <div class="label">What’s your one goal?</div>
-        <input id="goalInput" class="input" maxlength="80" placeholder="One line (e.g., Close one £20k sale)">
-        <button id="saveGoal" class="btn btn-primary">Save</button>
+    <!-- First visit -->
+    <section id="goalCard" class="card" style="display:none">
+      <div class="stack">
+        <label for="goalInput" class="label">What’s your one goal?</label>
+        <input id="goalInput" class="field" maxlength="80" placeholder="One line (e.g., Close one £20k sale)" />
+        <button id="saveGoal" class="btn">Save</button>
       </div>
     </section>
 
-    <!-- Daily input -->
-    <section id="dailyCard" class="panel">
-      <div class="block">
-        <div class="label">Goal</div>
-        <div id="goalLabel" class="goal-head"></div>
-        <input id="lineInput" class="input" maxlength="120"
+    <!-- Daily -->
+    <section id="dailyCard" class="card" style="display:none">
+      <div class="label">Goal</div>
+      <h2 id="goalLabel" class="goal-title"></h2>
+      <div class="stack">
+        <input id="lineInput" class="field" maxlength="120"
                placeholder="How did you move toward your goal today?"
-               aria-label="How did you move toward your goal today?">
-        <button id="logBtn" class="btn btn-primary">Log today ✅</button>
-        <div class="note">One line per day. No edits later.</div>
+               aria-label="How did you move toward your goal today?"/>
+        <button id="logBtn" class="btn">Log today ✅</button>
       </div>
+      <div class="hint">One line per day. No edits later.</div>
     </section>
 
-    <!-- After logging today -->
-    <section id="statusCard" class="panel">
+    <!-- After logging -->
+    <section id="statusCard" class="card" style="display:none">
       <div class="status">
         <div id="statusText">Logged for today <span class="tick">✅</span></div>
-      </div>
-      <div id="streakLine" class="streak"></div>
-    </section>
-
-    <!-- History -->
-    <section id="historyCard" class="panel">
-      <div class="table">
-        <div class="thead">
-          <div class="cell">Date</div>
-          <div class="cell">One line</div>
-        </div>
-        <div id="historyBody"></div>
+        <div class="hint" id="streakLine"></div>
       </div>
     </section>
 
-    <!-- Complete -->
-    <section id="completeWrap" class="panel" style="text-align:center">
-      <button id="completeBtn" class="btn btn-primary" style="max-width:420px;margin:0 auto">Goal complete ✅</button>
+    <!-- History table -->
+    <section id="historyCard" class="card table-card" style="display:none">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th class="col-date">Date</th><th class="col-line">One line</th></tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Goal complete -->
+    <section id="completeWrap" style="display:none">
+      <div class="complete">
+        <button id="completeBtn" class="btn">Goal complete ✅</button>
+      </div>
     </section>
   </main>
 
 <script>
-  /* -------- storage helpers -------- */
-  const LS = {
-    get:(k,f=null)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
-    set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-    del:k=>localStorage.removeItem(k)
-  };
+/* -------- storage helpers -------- */
+const LS = {
+  get:(k,f=null)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  del:k=>localStorage.removeItem(k)
+};
 
-  /* -------- virtual day (for testing): +1 per refresh -------- */
-  const iso = d=>d.toISOString().slice(0,10);
-  const addDays=(s,n)=>{const d=new Date(s); d.setDate(d.getDate()+n); return iso(d)};
-  let vToday = LS.get('one_vToday');
-  if(!vToday){ vToday = iso(new Date()); } else { vToday = addDays(vToday,1); }
-  LS.set('one_vToday', vToday);
+/* -------- virtual day per refresh (for testing) -------- */
+const iso = d=>d.toISOString().slice(0,10);
+const addDays=(s,n)=>{const d=new Date(s);d.setDate(d.getDate()+n);return iso(d)};
+let vToday = LS.get('one_vToday');
+if(!vToday){ vToday = iso(new Date()); } else { vToday = addDays(vToday,1); }
+LS.set('one_vToday', vToday);
 
-  /* -------- pretty date like Monday 15th August 2025 -------- */
-  const ord = n => { const s=["th","st","nd","rd"], v=n%100; return s[(v-20)%10]||s[v]||s[0]; };
-  function pretty(isoStr){
-    const d=new Date(isoStr);
-    const weekday=d.toLocaleString('en-GB',{weekday:'long'});
-    const day=d.getDate();
-    const month=d.toLocaleString('en-GB',{month:'long'});
-    const year=d.getFullYear();
-    return `${weekday} ${day}${ord(day)} ${month} ${year}`;
+/* -------- pretty date: Thursday 25th September 2025 -------- */
+const ord = n => {const s=["th","st","nd","rd"], v=n%100; return s[(v-20)%10]||s[v]||s[0];};
+function pretty(isoStr){
+  const d=new Date(isoStr);
+  const weekday=d.toLocaleString('en-GB',{weekday:'long'});
+  const day=d.getDate();
+  const month=d.toLocaleString('en-GB',{month:'long'});
+  const year=d.getFullYear();
+  return `${weekday} ${day}${ord(day)} ${month} ${year}`;
+}
+
+/* -------- state -------- */
+let goal    = LS.get('one_goal','');
+let entries = LS.get('one_entries',[]); // [{date,line}]
+const hasEntry = s => entries.some(e=>e.date===s);
+
+/* -------- els -------- */
+const goalCard   = document.getElementById('goalCard');
+const goalInput  = document.getElementById('goalInput');
+const saveGoal   = document.getElementById('saveGoal');
+
+const dailyCard  = document.getElementById('dailyCard');
+const goalLabel  = document.getElementById('goalLabel');
+const lineInput  = document.getElementById('lineInput');
+const logBtn     = document.getElementById('logBtn');
+
+const statusCard = document.getElementById('statusCard');
+const statusText = document.getElementById('statusText');
+const streakLine = document.getElementById('streakLine');
+
+const historyCard= document.getElementById('historyCard');
+const historyBody= document.getElementById('historyBody');
+
+const completeWrap=document.getElementById('completeWrap');
+const completeBtn = document.getElementById('completeBtn');
+
+/* -------- render helpers -------- */
+function streak(){
+  let s=0, d=vToday;
+  while(hasEntry(d)){ s++; d=addDays(d,-1); }
+  return s;
+}
+
+function renderHistory(){
+  historyBody.innerHTML='';
+  if(entries.length===0) return;
+  const first = entries.map(e=>e.date).sort()[0];
+  let cur=vToday;
+  while(cur>=first){
+    const found = entries.find(e=>e.date===cur);
+    const line = found ? found.line : '';
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td class="col-date">${pretty(cur)}</td><td class="col-line">${line}</td>`;
+    historyBody.appendChild(tr);
+    cur=addDays(cur,-1);
   }
+}
 
-  /* -------- state -------- */
-  let goal    = LS.get('one_goal','');
-  let entries = LS.get('one_entries',[]); // [{date,line}]
-  const hasEntry = s => entries.some(e=>e.date===s);
-
-  /* -------- elements -------- */
-  const goalCard = document.getElementById('goalCard');
-  const goalInput= document.getElementById('goalInput');
-  const saveGoal = document.getElementById('saveGoal');
-
-  const dailyCard= document.getElementById('dailyCard');
-  const goalLabel= document.getElementById('goalLabel');
-  const lineInput= document.getElementById('lineInput');
-  const logBtn   = document.getElementById('logBtn');
-
-  const statusCard = document.getElementById('statusCard');
-  const statusText = document.getElementById('statusText');
-  const streakLine = document.getElementById('streakLine');
-
-  const historyCard= document.getElementById('historyCard');
-  const historyBody= document.getElementById('historyBody');
-
-  const completeWrap= document.getElementById('completeWrap');
-  const completeBtn = document.getElementById('completeBtn');
-
-  /* -------- UI helpers -------- */
-  function streak(){
-    let s=0, d=vToday;
-    while(hasEntry(d)){ s++; d=addDays(d,-1); }
-    return s;
+function showState(){
+  if(!goal){
+    goalCard.style.display='block';
+    dailyCard.style.display='none';
+    statusCard.style.display='none';
+    historyCard.style.display='none';
+    completeWrap.style.display='none';
+    return;
   }
+  goalCard.style.display='none';
+  goalLabel.textContent=goal;
 
-  function renderHistory(){
-    historyBody.innerHTML='';
-    if(entries.length===0) return;
-
-    const first = entries.map(e=>e.date).sort()[0];
-    let cur=vToday;
-    while(cur>=first){
-      const hit = entries.find(e=>e.date===cur);
-      const line = hit ? hit.line : '';
-      const row = document.createElement('div');
-      row.className='row';
-      row.innerHTML = `<div class="cell">${pretty(cur)}</div><div class="cell">${line}</div>`;
-      historyBody.appendChild(row);
-      cur=addDays(cur,-1);
-    }
-  }
-
-  function showState(){
-    if(!goal){
-      goalCard.style.display='block';
-      dailyCard.style.display='none';
-      statusCard.style.display='none';
-      historyCard.style.display='none';
-      completeWrap.style.display='none';
-      return;
-    }
-    goalCard.style.display='none';
-    goalLabel.textContent=goal;
-
-    if(!hasEntry(vToday)){
-      dailyCard.style.display='block';
-      statusCard.style.display='none';
-      historyCard.style.display='none';
-      completeWrap.style.display='none';
-    }else{
-      dailyCard.style.display='none';
-      statusCard.style.display='block';
-      const s=streak();
-      statusText.innerHTML=`Logged for today <span class="tick">✅</span>`;
-      streakLine.textContent=`Streak: ${s} day${s===1?'':'s'} ✅`;
-      renderHistory();
-      historyCard.style.display='block';
-      completeWrap.style.display='block';
-    }
-  }
-
-  /* -------- actions -------- */
-  saveGoal.onclick = () => {
-    const t=(goalInput.value||'').trim();
-    if(!t){goalInput.focus();return;}
-    goal=t; LS.set('one_goal',goal);
-    showState();
-  };
-
-  logBtn.onclick = () => {
-    const line=(lineInput.value||'').trim();
-    if(!line){lineInput.focus();return;}
-    if(hasEntry(vToday)) return;
-    entries.push({date:vToday,line});
-    LS.set('one_entries',entries);
-    lineInput.value='';
+  if(!hasEntry(vToday)){
+    dailyCard.style.display='block';
+    statusCard.style.display='none';
+    historyCard.style.display='none';
+    completeWrap.style.display='none';
+  }else{
+    dailyCard.style.display='none';
+    statusCard.style.display='block';
+    const s=streak();
+    statusText.innerHTML=`Logged for today <span class="tick">✅</span>`;
+    streakLine.textContent=`Streak: ${s} day${s===1?'':'s'} ✅`;
     document.querySelector('.tick').classList.add('pop');
     setTimeout(()=>document.querySelector('.tick').classList.remove('pop'),180);
-    showState(); // flips to status + table including today
-  };
 
-  completeBtn.onclick = () => {
-    if(!confirm('Mark goal complete and reset?')) return;
-    LS.del('one_goal'); LS.del('one_entries');
-    goal=''; entries=[];
-    showState();
-  };
+    renderHistory();
+    historyCard.style.display='block';
+    completeWrap.style.display='block';
+  }
+}
 
-  /* -------- boot -------- */
+/* -------- actions -------- */
+saveGoal.onclick=()=>{
+  const t=(goalInput.value||'').trim();
+  if(!t){goalInput.focus();return;}
+  goal=t; LS.set('one_goal',goal);
   showState();
+};
+
+logBtn.onclick=()=>{
+  const line=(lineInput.value||'').trim();
+  if(!line){lineInput.focus();return;}
+  if(hasEntry(vToday)) return;
+  entries.push({date:vToday,line});
+  LS.set('one_entries',entries);
+  lineInput.value='';
+  showState();
+  // scroll to status/table
+  setTimeout(()=>document.getElementById('statusCard').scrollIntoView({behavior:'smooth',block:'start'}),50);
+};
+
+completeBtn.onclick=()=>{
+  if(!confirm('Mark goal complete and reset?')) return;
+  LS.del('one_goal'); LS.del('one_entries');
+  goal=''; entries=[];
+  showState();
+};
+
+/* -------- boot -------- */
+showState();
 </script>
 </body>
 </html>
