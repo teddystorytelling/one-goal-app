@@ -49,6 +49,9 @@
   }
   .stack{padding:20px;display:grid;gap:14px}
 
+  /* Center goal card on page */
+  .centerer{min-height:62vh; display:grid; place-items:center}
+
   /* Section header */
   .section-head{display:flex; align-items:center; justify-content:space-between; padding: 2px 2px 8px; font-weight:700;}
 
@@ -95,9 +98,7 @@
   .view.exiting{opacity:0; transform:translateX(-12px)}
 
   /* Table (revealed only after today’s log) */
-  .table{
-    width:100%; border-collapse:separate; border-spacing:0; margin-top:8px;
-  }
+  .table{ width:100%; border-collapse:separate; border-spacing:0; margin-top:8px; }
   .table thead th{
     text-align:left; font-size:12px; color:var(--muted); padding:12px 14px;
     position:sticky; top:0; backdrop-filter: blur(8px);
@@ -117,7 +118,7 @@
   }
   .btn-ghost:active{ filter:brightness(.92) }
 
-  /* Footer (Apple-luxury glass; hidden on first page) */
+  /* Footer (Apple-luxury glass) — only on table page when revealed */
   footer{
     display:none; position:fixed; left:0; right:0; bottom:0; padding:12px 14px;
     background:rgba(8,12,18,.55);
@@ -163,7 +164,7 @@
   .cele-archive thead th{ position:sticky; top:0; background:#0f1116d9; backdrop-filter:blur(6px); color:var(--muted); font-size:12px }
   .cele-archive tbody tr{ border-top:1px solid var(--border) }
 
-  /* Streak overlay (gated, after logging action if streak ≥ 2) */
+  /* Streak overlay (gated) */
   .streak-pills{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:720px; margin: 10px auto 0 }
   .pill{
     padding:10px 14px; border-radius:999px;
@@ -208,20 +209,22 @@
 <div class="wrap">
   <div class="hero">
     <div class="dot"></div>
-    <h1>There’s only one thing you have to do…</h1>
+    <h1>One thing you have to do…</h1>
   </div>
 
   <!-- GOAL SETUP (first-time) -->
   <div id="view-goal" class="view active">
-    <div class="card">
-      <div class="stack">
-        <div class="section-head">What’s your one goal?</div>
-        <div class="row">
-          <div class="input-wrap">
-            <input id="goalInput" class="onething" type="text" autocomplete="off">
-            <div id="goalKaraoke" class="karaoke"><span></span></div>
+    <div class="centerer">
+      <div class="card">
+        <div class="stack">
+          <div class="section-head">What’s your one goal?</div>
+          <div class="row">
+            <div class="input-wrap">
+              <input id="goalInput" class="onething" type="text" autocomplete="off">
+              <div id="goalKaraoke" class="karaoke"><span></span></div>
+            </div>
+            <button id="saveGoalBtn" class="btn">Save</button>
           </div>
-          <button id="saveGoalBtn" class="btn">Save</button>
         </div>
       </div>
     </div>
@@ -245,9 +248,9 @@
           <thead>
             <tr><th class="td-date">Date</th><th class="td-text">Actions toward this goal</th></tr>
           </thead>
-          <tbody id="logBody">
-            <tr id="emptyRow"><td colspan="2" class="empty">No actions yet. Log your first one above.</td></tr>
-          </tbody>
+        <tbody id="logBody">
+          <tr id="emptyRow"><td colspan="2" class="empty">No actions yet. Log your first one above.</td></tr>
+        </tbody>
         </table>
 
         <div class="goal-complete-wrap">
@@ -257,7 +260,7 @@
     </div>
   </div>
 
-  <!-- ACHIEVEMENTS (only reachable via celebration path) -->
+  <!-- ACHIEVEMENTS (celebration path only) -->
   <div id="view-achievements" class="view">
     <div class="card" style="padding:18px;">
       <h3 class="section-title">Achievements</h3>
@@ -266,17 +269,15 @@
     </div>
   </div>
 
-  <!-- SETTINGS (footer link only) -->
+  <!-- SETTINGS -->
   <div id="view-settings" class="view">
     <div class="card settings-card">
       <h3 class="section-title">Settings</h3>
       <button id="deactivateBtn" class="btn danger">Deactivate account (clear all)</button>
 
-      <!-- Sign up collapsible -->
       <div class="collapse" id="signupCollapse" style="margin-top:16px;">
         <div class="collapse-head" id="signupHead">
-          <h4>Sign up</h4>
-          <span id="signupChevron">▸</span>
+          <h4>Sign up</h4><span id="signupChevron">▸</span>
         </div>
         <div class="collapse-body" id="signupBody">
           <div class="field"><label>Name</label><input id="name" class="input" type="text" placeholder="Your name"></div>
@@ -292,7 +293,7 @@
   </div>
 </div>
 
-<!-- FOOTER (hidden on goal view) -->
+<!-- FOOTER (only on actions table page when revealed) -->
 <footer id="footer">
   <div class="footer-inner">
     <span>Teddy Storytelling</span>
@@ -300,7 +301,7 @@
   </div>
 </footer>
 
-<!-- CELEBRATION OVERLAY (Goal Complete) -->
+<!-- CELEBRATION OVERLAY -->
 <div id="celebrate" class="overlay" aria-modal="true" role="dialog">
   <div class="cele-card">
     <div class="cele-hero">
@@ -322,7 +323,7 @@
   </div>
 </div>
 
-<!-- STREAK OVERLAY (gated after logging action if streak ≥ 2) -->
+<!-- STREAK OVERLAY -->
 <div id="streakGate" class="overlay" aria-modal="true" role="dialog">
   <div class="cele-card">
     <div class="cele-hero">
@@ -345,28 +346,20 @@ const K = {
   LAST_ACTION: 'ot.lastAction',
   ACH: 'ot.achievements',
   FOOTER: 'ot.footer',
-  SIM_DAY: 'ot.simDay' // simulated "today" (ISO) for test-as-new-day
+  SIM_DAY: 'ot.simDay'
 };
 
 /* ================= Simulated day (each refresh = +1 day) ================= */
 function realTodayISO(){ return new Date().toISOString().slice(0,10); }
-function isoPlusDays(iso, days){
-  const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+days);
-  return d.toISOString().slice(0,10);
-}
+function isoPlusDays(iso, days){ const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
 function initSimDay(){
   let sim = localStorage.getItem(K.SIM_DAY);
-  if(!sim){ sim = realTodayISO(); }
-  else{ sim = isoPlusDays(sim, 1); } // advance 1 day on each load
-  localStorage.setItem(K.SIM_DAY, sim);
-  return sim;
+  if(!sim){ sim = realTodayISO(); } else { sim = isoPlusDays(sim, 1); }
+  localStorage.setItem(K.SIM_DAY, sim); return sim;
 }
 let SIM_TODAY = initSimDay();
 function todayISO(){ return SIM_TODAY; }
-function yISO(){
-  const d = new Date(SIM_TODAY+'T00:00:00'); d.setDate(d.getDate()-1);
-  return d.toISOString().slice(0,10);
-}
+function yISO(){ const d = new Date(SIM_TODAY+'T00:00:00'); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
 
 /* ================= Utilities ================= */
 const fmt = iso => new Date(iso+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
@@ -387,7 +380,6 @@ function switchView(to){
   if(cur){ cur.classList.add('exiting'); setTimeout(()=>{ cur.classList.remove('active','exiting'); }, 150); }
   nxt.classList.add('active');
   currentView = to;
-  // footer: hidden on goal view, visible elsewhere if enabled
   showFooterIfNeeded();
 }
 
@@ -438,23 +430,12 @@ const examples = [
   "Tell a loved one one thing you appreciate about them",
   "Run 5 kilometers this week"
 ];
-function setKaraokeText(){
-  const text = examples[Math.floor(Math.random()*examples.length)];
-  karaokeSpan.textContent = ` ${text} \u00A0\u00A0\u00A0 ${text} \u00A0\u00A0\u00A0 ${text} `;
-}
-function toggleKaraoke(){
-  const show = !goalInput.value.trim() && document.activeElement !== goalInput;
-  goalKaraoke.classList.toggle('hidden', !show);
-}
+function setKaraokeText(){ const text = examples[Math.floor(Math.random()*examples.length)]; karaokeSpan.textContent = ` ${text} \u00A0\u00A0\u00A0 ${text} \u00A0\u00A0\u00A0 ${text} `; }
+function toggleKaraoke(){ const show = !goalInput.value.trim() && document.activeElement !== goalInput; goalKaraoke.classList.toggle('hidden', !show); }
 
 /* ================= Render helpers ================= */
-function renderGoalLabel(){
-  const g = load(K.GOAL, null);
-  goalLabel.textContent = g ? `Goal: ${g.text}` : '';
-}
-function hasLoggedToday(actions){
-  return actions.some(a=> a.date === todayISO());
-}
+function renderGoalLabel(){ const g = load(K.GOAL, null); goalLabel.textContent = g ? `Goal: ${g.text}` : ''; }
+function hasLoggedToday(actions){ return actions.some(a=> a.date === todayISO()); }
 function renderActionsTable(){
   const actions = load(K.ACTIONS, []);
   logBody.innerHTML = '';
@@ -475,20 +456,18 @@ function refreshActionsViewReveal(){
   const actions = load(K.ACTIONS, []);
   const todayDone = hasLoggedToday(actions);
   if(todayDone){
-    // hide input row, reveal table
     actionInputRow.style.display = 'none';
     tableBlock.classList.remove('hidden-block');
   }else{
-    // show input row, keep table hidden (even if past exists)
     actionInputRow.style.display = '';
     tableBlock.classList.add('hidden-block');
   }
+  showFooterIfNeeded();
 }
 
 /* ================= Confetti ================= */
 function spawnConfetti(box, n=42){
-  box.innerHTML='';
-  const W = box.clientWidth||800;
+  box.innerHTML=''; const W = box.clientWidth||800;
   for(let i=0;i<n;i++){
     const iel = document.createElement('i');
     iel.style.left = (Math.random()*W) + 'px';
@@ -507,12 +486,10 @@ function updateStreakOnAction(){
   const last = localStorage.getItem(K.LAST_ACTION);
   const today = todayISO();
   let streak = load(K.STREAK, 0);
-
   if(!last){ streak = 1; }
   else if(last === today){ /* same day, unchanged */ }
   else if(last === yISO()){ streak = streak + 1; }
   else { streak = 1; }
-
   save(K.STREAK, streak);
   localStorage.setItem(K.LAST_ACTION, today);
   return streak;
@@ -532,85 +509,50 @@ function openCelebration(goal, actions){
   spawnConfetti(confetti1);
   celebrate.classList.add('show');
 }
-function closeCelebration(){
-  celebrate.classList.remove('show');
-  setTimeout(()=>{ celeBody.innerHTML=''; confetti1.innerHTML=''; },240);
-}
+function closeCelebration(){ celebrate.classList.remove('show'); setTimeout(()=>{ celeBody.innerHTML=''; confetti1.innerHTML=''; },240); }
 function openStreakGate(streak){
   streakLabel.textContent = `Current streak: ${streak} day${streak===1?'':'s'}`;
-  streakPills.innerHTML='';
-  for(let i=0;i<streak;i++){
-    const d=document.createElement('div'); d.className='pill'; d.textContent='✅'; streakPills.appendChild(d);
-  }
-  spawnConfetti(confetti2, 30);
-  streakGate.classList.add('show');
+  streakPills.innerHTML=''; for(let i=0;i<streak;i++){ const d=document.createElement('div'); d.className='pill'; d.textContent='✅'; streakPills.appendChild(d); }
+  spawnConfetti(confetti2, 30); streakGate.classList.add('show');
 }
-function closeStreakGate(){
-  streakGate.classList.remove('show');
-  setTimeout(()=>{ confetti2.innerHTML=''; streakPills.innerHTML=''; },240);
-}
+function closeStreakGate(){ streakGate.classList.remove('show'); setTimeout(()=>{ confetti2.innerHTML=''; streakPills.innerHTML=''; },240); }
 
 /* ================= Actions ================= */
 document.getElementById('saveGoalBtn').addEventListener('click', ()=>{
   const text = goalInput.value.trim();
   if(!text){ alert('Please enter your one goal.'); return; }
   const goal = { text, createdAt: new Date().toISOString() };
-  save(K.GOAL, goal);
-  save(K.ACTIONS, []); // fresh action list for this goal
+  save(K.GOAL, goal); save(K.ACTIONS, []);
   renderGoalLabel(); renderActionsTable();
-  switchView('act');
-  refreshActionsViewReveal();
+  switchView('act'); refreshActionsViewReveal();
 });
 
 document.getElementById('logActionBtn').addEventListener('click', ()=>{
-  const text = actionInput.value.trim();
-  if(!text){ return; }
+  const text = actionInput.value.trim(); if(!text){ return; }
   const actions = load(K.ACTIONS, []);
-  // enforce one per day silently by revealing table & hiding input (no popup)
-  if(actions.some(a=> a.date === todayISO())){
-    refreshActionsViewReveal(); return;
-  }
-
+  if(actions.some(a=> a.date === todayISO())){ refreshActionsViewReveal(); return; }
   const entry = { date: todayISO(), text, time: new Date().toISOString() };
   actions.push(entry); save(K.ACTIONS, actions);
-  actionInput.value='';
-  renderActionsTable();
-  refreshActionsViewReveal();
+  actionInput.value=''; renderActionsTable(); refreshActionsViewReveal();
 
-  // first time -> reveal footer on non-goal views
-  localStorage.setItem(K.FOOTER,'1');
-  showFooterIfNeeded();
-
-  // streak update and gated overlay (show only when streak >= 2)
-  const streak = updateStreakOnAction();
-  if(streak >= 2){ openStreakGate(streak); }
+  localStorage.setItem(K.FOOTER,'1'); // allow footer
+  const streak = updateStreakOnAction(); if(streak >= 2){ openStreakGate(streak); }
 });
 
 document.getElementById('completeGoalBtn').addEventListener('click', ()=>{
-  const goal = load(K.GOAL, null);
-  if(!goal){ alert('No active goal to complete.'); return; }
-  const actions = load(K.ACTIONS, []);
-  goal.completedAt = new Date().toISOString();
-  const ach = load(K.ACH, []);
-  ach.push({ goal, actions });
-  save(K.ACH, ach);
-
+  const goal = load(K.GOAL, null); if(!goal){ alert('No active goal to complete.'); return; }
+  const actions = load(K.ACTIONS, []); goal.completedAt = new Date().toISOString();
+  const ach = load(K.ACH, []); ach.push({ goal, actions }); save(K.ACH, ach);
   openCelebration(goal, actions);
-  // reset after closing celebration
 });
 
-/* celebration buttons */
 document.getElementById('closeCeleBtn').addEventListener('click', ()=>{
-  save(K.GOAL, null); save(K.ACTIONS, []);
-  closeCelebration();
-  switchView('goal');
-  setKaraokeText(); toggleKaraoke();
+  save(K.GOAL, null); save(K.ACTIONS, []); closeCelebration();
+  switchView('goal'); setKaraokeText(); toggleKaraoke();
 });
 document.getElementById('viewAchievementsBtn').addEventListener('click', ()=>{
-  save(K.GOAL, null); save(K.ACTIONS, []);
-  closeCelebration();
-  const ach = load(K.ACH, []);
-  const box = document.getElementById('achievementsList');
+  save(K.GOAL, null); save(K.ACTIONS, []); closeCelebration();
+  const ach = load(K.ACH, []); const box = document.getElementById('achievementsList');
   if(!ach.length){ box.textContent = 'No completed goals yet.'; }
   else{
     const html = ach.slice().reverse().map(item=>{
@@ -635,23 +577,16 @@ document.getElementById('openSettings').addEventListener('click', ()=> switchVie
 deactivateBtn.addEventListener('click', ()=>{
   if(confirm('Deactivate account and clear all data?')){
     Object.values(K).forEach(k=> localStorage.removeItem(k));
-    SIM_TODAY = initSimDay(); // reset sim day to restart flow nicely
-    switchView('goal');
-    goalInput.value=''; actionInput.value='';
-    renderActionsTable(); renderGoalLabel();
-    setKaraokeText(); toggleKaraoke();
-    footer.style.display='none';
-    alert('All cleared. Fresh start.');
+    SIM_TODAY = initSimDay();
+    switchView('goal'); goalInput.value=''; actionInput.value='';
+    renderActionsTable(); renderGoalLabel(); setKaraokeText(); toggleKaraoke();
+    footer.style.display='none'; alert('All cleared. Fresh start.');
   }
 });
 
 /* sign-up collapsible */
 let collapseOpen = false;
-function toggleSignup(){
-  collapseOpen = !collapseOpen;
-  signupCollapse.classList.toggle('open', collapseOpen);
-  signupChevron.textContent = collapseOpen ? '▾' : '▸';
-}
+function toggleSignup(){ collapseOpen = !collapseOpen; signupCollapse.classList.toggle('open', collapseOpen); signupChevron.textContent = collapseOpen ? '▾' : '▸'; }
 signupHead.addEventListener('click', toggleSignup);
 signupBtn.addEventListener('click', ()=>{
   const name = document.getElementById('name').value.trim();
@@ -676,27 +611,19 @@ goalInput.addEventListener('input', toggleKaraoke);
 
 /* ================= Footer display logic ================= */
 function showFooterIfNeeded(){
-  // Footer never shows on goal view; shows on others if flag set
-  if(currentView === 'goal'){ footer.style.display = 'none'; return; }
+  // Only on actions view AND only when the table is revealed for today
+  const allowed = currentView === 'act' && !tableBlock.classList.contains('hidden-block');
   const has = localStorage.getItem(K.FOOTER)==='1';
-  footer.style.display = has ? 'block' : 'none';
+  footer.style.display = (allowed && has) ? 'block' : 'none';
 }
 
 /* ================= Init ================= */
 (function init(){
-  // If a goal exists, go to actions; else show goal setup
   const g = load(K.GOAL, null);
-  if(g){
-    renderGoalLabel(); renderActionsTable(); switchView('act');
-    refreshActionsViewReveal();
-  }else{
-    views.goal.classList.add('active'); currentView='goal';
-  }
+  if(g){ renderGoalLabel(); renderActionsTable(); switchView('act'); refreshActionsViewReveal(); }
+  else { views.goal.classList.add('active'); currentView='goal'; }
 
-  // karaoke
   setKaraokeText(); toggleKaraoke();
-
-  // footer visibility on first load
   showFooterIfNeeded();
 })();
 </script>
